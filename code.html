@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ethan Liu — Mechanical Engineering Portfolio</title>
+<!--
+  ================= IMAGE FILES NEEDED (place in /images) =================
+  REV12 HERO:
+    rev12-full.png        -> full car WITH aero package + tires
+    rev12-bare.png        -> bare chassis/unsprung (mirror the unsprung assembly here)
+  DRIVETRAIN:
+    gearbox-section.png   -> grey gearbox cross-section CAD
+    cooling-loop.png      -> motor/inverter cooling loop CAD (purple hoses)
+    wheelhub-fea-setup.png-> Ansys bolt-pretension load setup (wheelhub)
+    wheelhub-fea-stress.png-> von-Mises result (wheelhub)
+    upright-fea-setup.png -> Ansys bearing/bolt load setup (upright)
+    upright-fea-stress.png-> von-Mises result (upright)
+    thermal-sim.png       -> Python thermal sim validation slide
+    wheelhub-drawing.png  -> Wheelhub v2 GD&T drawing (export page 2 of the PDF)
+  AERO:
+    aero-overview.png     -> REV11 aero overview slide
+  DRIVER INTERFACE / CHASSIS:
+    chassis-frame.png     -> tube-frame chassis CAD
+  ACCUMULATOR:
+    accumulator.png       -> accumulator / inverter box CAD
+  SUSPENSION:
+    suspension.png        -> tie-rod linkage CAD
+  REV11:
+    rev11-rearwing.png    -> rear wing / aero render
+  DRS:
+    drs-cfd.png           -> DRS delta-velocity CFD slide
+    drs-pneumatic.png     -> DRS pneumatic system slide
+  ========================================================================
+-->
+<style>
+  :root{
+    --bg:#0a0d13; --panel:#121724; --panel2:#192030;
+    --text:#e8ebf1; --muted:#95a0b2; --line:#263040;
+    --accent:#e23b3b; --accent2:#8b5cf6; --green:#34d399; --blue:#38bdf8;
+    --radius:16px; --max:1180px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+       background:var(--bg);color:var(--text);line-height:1.65;overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+  img{max-width:100%;display:block}
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
+
+  /* NAV */
+  nav{position:sticky;top:0;z-index:60;backdrop-filter:blur(12px);
+      background:rgba(10,13,19,.8);border-bottom:1px solid var(--line)}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:66px}
+  .logo{font-weight:800;letter-spacing:.5px;font-size:1.1rem}
+  .logo span{color:var(--accent)}
+  .navlinks{display:flex;gap:24px}
+  .navlinks a{color:var(--muted);font-size:.9rem;transition:.2s}
+  .navlinks a:hover{color:var(--text)}
+  .menu-btn{display:none;background:none;border:none;color:var(--text);font-size:1.5rem;cursor:pointer}
+
+  /* HERO INTRO */
+  header{position:relative;padding:110px 0 70px;overflow:hidden}
+  header::before{content:"";position:absolute;inset:0;
+     background:radial-gradient(900px 500px at 78% -10%,rgba(226,59,59,.22),transparent 60%),
+                radial-gradient(760px 520px at 12% 15%,rgba(139,92,246,.18),transparent 60%);}
+  .hero{position:relative;display:grid;grid-template-columns:1.25fr .75fr;gap:44px;align-items:center}
+  .tag{display:inline-block;font-size:.78rem;letter-spacing:2px;text-transform:uppercase;
+       color:var(--accent);border:1px solid var(--line);padding:6px 14px;border-radius:999px;margin-bottom:20px}
+  .hero h1{font-size:clamp(2.1rem,5.2vw,3.7rem);line-height:1.08;font-weight:800;margin-bottom:18px}
+  .hero h1 em{color:var(--accent);font-style:normal}
+  .hero p{color:var(--muted);font-size:1.08rem;max-width:540px;margin-bottom:28px}
+  .btns{display:flex;gap:14px;flex-wrap:wrap}
+  .btn{padding:12px 22px;border-radius:999px;font-weight:600;transition:.2s;border:1px solid transparent;cursor:pointer;font-size:.95rem}
+  .btn.primary{background:var(--accent);color:#fff}
+  .btn.primary:hover{filter:brightness(1.1);transform:translateY(-2px)}
+  .btn.ghost{border-color:var(--line);color:var(--text)}
+  .btn.ghost:hover{border-color:var(--accent)}
+  .hero-card{background:linear-gradient(160deg,var(--panel),var(--panel2));
+     border:1px solid var(--line);border-radius:var(--radius);padding:26px}
+  .hero-card h3{font-size:.82rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:14px}
+  .stat{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px dashed var(--line)}
+  .stat:last-child{border:none}
+  .stat b{color:var(--accent)}
+
+  /* CATEGORY DIVIDER */
+  .category{padding:54px 0 10px}
+  .category .wrap{display:flex;align-items:center;gap:20px}
+  .category h2{font-size:clamp(1.5rem,3.5vw,2rem);font-weight:800;white-space:nowrap}
+  .category h2 span{color:var(--accent)}
+  .category .bar{flex:1;height:1px;background:linear-gradient(90deg,var(--accent),transparent)}
+  .category .count{font-size:.8rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase}
+
+  /* SECTION SHELL */
+  section{padding:40px 0}
+  .shead{margin-bottom:38px;max-width:760px}
+  .shead .kicker{color:var(--accent);font-weight:700;letter-spacing:2px;font-size:.78rem;text-transform:uppercase}
+  .shead h2{font-size:clamp(1.7rem,4vw,2.4rem);font-weight:800;margin:8px 0}
+  .shead p{color:var(--muted)}
+
+  .proj-label{display:inline-flex;align-items:center;gap:10px;font-size:.8rem;letter-spacing:2px;
+     text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+  .proj-label .dot{width:9px;height:9px;border-radius:50%;background:var(--accent)}
+
+  /* REV12 HERO SPLIT */
+  .rev12-hero{position:relative;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;
+     background:linear-gradient(180deg,#e9ecf0,#dfe3e8);aspect-ratio:16/8.3}
+  .rev12-hero .layer{position:absolute;inset:0;background-size:cover;background-position:center}
+  .rev12-hero .full{background-image:url('images/rev12-full.png');clip-path:polygon(0 0,52% 0,48% 100%,0 100%)}
+  .rev12-hero .bare{background-image:url('images/rev12-bare.png');clip-path:polygon(52% 0,100% 0,100% 100%,48% 100%)}
+  .rev12-hero .divider{position:absolute;top:0;bottom:0;left:50%;width:2px;transform:skewX(-8deg);
+     background:linear-gradient(180deg,transparent,var(--accent),transparent);box-shadow:0 0 18px rgba(226,59,59,.6)}
+  .rev12-hero .pill{position:absolute;top:16px;font-size:.72rem;letter-spacing:1px;text-transform:uppercase;
+     background:rgba(10,13,19,.75);color:#fff;padding:5px 12px;border-radius:999px;border:1px solid var(--line)}
+  .rev12-hero .pill.l{left:16px} .rev12-hero .pill.r{right:16px}
+
+  /* SUBSYSTEM NAV */
+  .subnav{display:flex;flex-wrap:wrap;gap:10px;margin:26px 0 8px}
+  .subnav a{font-size:.82rem;color:var(--muted);border:1px solid var(--line);padding:8px 15px;border-radius:999px;transition:.2s}
+  .subnav a:hover{border-color:var(--accent);color:var(--text)}
+
+  /* SUBSYSTEM BLOCK (zoom reveal) */
+  .sub{display:grid;grid-template-columns:1fr 1fr;gap:34px;align-items:center;padding:44px 0;
+     border-top:1px dashed var(--line)}
+  .sub:nth-child(even) .sub-media{order:2}
+  .sub-media{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#e9ecf0}
+  .sub-media.dark{background:#1f242e}
+  .sub-media img{width:100%;height:100%;object-fit:cover}
+  .sub-badge{display:inline-block;font-size:.72rem;letter-spacing:2px;text-transform:uppercase;
+     color:var(--accent2);border:1px solid var(--line);padding:5px 12px;border-radius:999px;margin-bottom:12px}
+  .sub h3{font-size:1.5rem;font-weight:800;margin-bottom:12px}
+  .sub ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+  .sub ul li{position:relative;padding-left:22px;color:var(--muted);font-size:.97rem}
+  .sub ul li::before{content:"▸";position:absolute;left:0;color:var(--accent)}
+  .sub ul li strong{color:var(--text)}
+  .gallery2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .gallery2 figure{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#141922}
+  .gallery2 figcaption{font-size:.72rem;color:var(--muted);padding:6px 8px;text-align:center}
+
+  /* zoom-in animation */
+  .reveal{opacity:0;transform:scale(.92) translateY(30px);transition:.7s cubic-bezier(.2,.7,.2,1)}
+  .reveal.in{opacity:1;transform:scale(1) translateY(0)}
+
+  .metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:16px;margin:8px 0 4px}
+  .metric{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:16px;text-align:center}
+  .metric .num{font-size:1.5rem;font-weight:800;color:var(--accent)}
+  .metric .lbl{color:var(--muted);font-size:.78rem;margin-top:4px}
+
+  /* GENERIC PROJECT CARD (internships / rev11 / drs) */
+  .pcard{display:grid;grid-template-columns:1fr 1fr;gap:34px;align-items:center;
+     background:linear-gradient(160deg,var(--panel),var(--panel2));border:1px solid var(--line);
+     border-radius:var(--radius);padding:30px;margin-top:10px}
+  .pcard:nth-of-type(even) .pcard-media{order:2}
+  .pcard-media{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#e9ecf0;min-height:240px}
+  .pcard-media.dark{background:#11161f}
+  .pcard h3{font-size:1.45rem;font-weight:800;margin-bottom:6px}
+  .pcard .role{color:var(--accent2);font-weight:600;font-size:.9rem;margin-bottom:14px}
+  .pcard ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+  .pcard ul li{position:relative;padding-left:22px;color:var(--muted);font-size:.95rem}
+  .pcard ul li::before{content:"▸";position:absolute;left:0;color:var(--accent)}
+  .pcard ul li strong{color:var(--text)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+  .chips span{font-size:.75rem;color:var(--muted);border:1px solid var(--line);padding:4px 11px;border-radius:999px}
+
+  /* CONTACT */
+  .contact{text-align:center;background:linear-gradient(160deg,var(--panel),var(--panel2));
+     border:1px solid var(--line);border-radius:var(--radius);padding:56px 30px}
+  .contact h2{font-size:clamp(1.7rem,4vw,2.5rem);font-weight:800;margin-bottom:12px}
+  .contact p{color:var(--muted);max-width:480px;margin:0 auto 24px}
+  footer{border-top:1px solid var(--line);padding:28px 0;color:var(--muted);text-align:center;font-size:.9rem}
+
+  @media(max-width:880px){
+    .hero,.sub,.pcard{grid-template-columns:1fr}
+    .sub:nth-child(even) .sub-media,.pcard:nth-of-type(even) .pcard-media{order:0}
+    .navlinks{display:none}
+    .menu-btn{display:block}
+    .navlinks.open{display:flex;position:absolute;top:66px;left:0;right:0;flex-direction:column;
+       background:var(--bg);padding:18px 24px;border-bottom:1px solid var(--line)}
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="wrap">
+    <div class="logo">Ethan Liu<span>.</span></div>
+    <div class="navlinks" id="nav">
+      <a href="#internships">Internships</a>
+      <a href="#spacex">SpaceX</a>
+      <a href="#relativity">Relativity</a>
+      <a href="#projects">Projects</a>
+      <a href="#rev12">REV12</a>
+      <a href="#rev11">REV11</a>
+      <a href="#drs">DRS</a>
+      <a href="#contact">Contact</a>
+    </div>
+    <button class="menu-btn" onclick="document.getElementById('nav').classList.toggle('open')">☰</button>
+  </div>
+</nav>
+
+<!-- INTRO -->
+<header>
+  <div class="wrap hero">
+    <div>
+      <span class="tag">Mechanical Engineer · Penn Electric Racing</span>
+      <h1>Hi, I'm <em>Ethan Liu</em> — I take racecars from <em>concept to podium</em>.</h1>
+      <p>B.S. Mechanical Engineering / M.S. Robotics candidate at the University of Pennsylvania.
+         Mechanical Lead on Penn Electric Racing's first 4WD formula-style EV in a decade, with
+         structures &amp; components internships at SpaceX and Relativity Space.</p>
+      <div class="btns">
+        <a class="btn primary" href="#internships">View Experience</a>
+        <a class="btn ghost" href="#contact">Get in Touch</a>
+      </div>
+    </div>
+    <div class="hero-card">
+      <h3>At a Glance</h3>
+      <div class="stat"><span>GPA</span><b>3.83 / 4.0</b></div>
+      <div class="stat"><span>CAD experience (SolidWorks / NX)</span><b>5 years</b></div>
+      <div class="stat"><span>Machining hours</span><b>300+</b></div>
+      <div class="stat"><span>Carbon fiber parts built</span><b>60+</b></div>
+      <div class="stat"><span>FSAE EV 2026</span><b>Design Finalist</b></div>
+    </div>
+  </div>
+</header>
+
+<!-- ======================================================= -->
+<!-- ================ INTERNSHIP EXPERIENCE ================= -->
+<!-- ======================================================= -->
+<div class="category" id="internships">
+  <div class="wrap">
+    <h2>Internship <span>Experience</span></h2>
+    <div class="bar"></div>
+    <div class="count">01 — 02</div>
+  </div>
+</div>
+
+<!-- SPACEX -->
+<section id="spacex">
+  <div class="wrap">
+    <div class="proj-label"><span class="dot"></span>Internship 01</div>
+    <div class="pcard reveal">
+      <div class="pcard-media dark" style="display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:.85rem;text-align:center;padding:20px">
+        SpaceX — Starbase, TX<br>(Booster Structures)
+      </div>
+      <div>
+        <h3>SpaceX — Booster Structures RE Intern</h3>
+        <div class="role">Responsible Engineer · Starbase, TX · May 2027 – Aug 2027</div>
+        <ul>
+          <li>Responsible-engineer work on <strong>Starship booster primary structures</strong>, supporting design, analysis, and hardware qualification in a high-cadence flight-development environment.</li>
+          <li>Owned structural deliverables through release, interfacing across manufacturing and test teams.</li>
+        </ul>
+        <div class="chips"><span>NX</span><span>Structural Analysis</span><span>Flight Hardware</span><span>Qualification</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RELATIVITY -->
+<section id="relativity">
+  <div class="wrap">
+    <div class="proj-label"><span class="dot"></span>Internship 02</div>
+    <div class="pcard reveal">
+      <div class="pcard-media dark" style="display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:.85rem;text-align:center;padding:20px">
+        Relativity Space — Long Beach, CA<br>(Components Engineering)
+      </div>
+      <div>
+        <h3>Relativity Space — Components RE Intern</h3>
+        <div class="role">Responsible Engineer · Long Beach, CA · May 2026 – Aug 2026</div>
+        <ul>
+          <li>Designed <strong>70 dev test cases</strong> on valves using GN2/GHe across ambient and cryo temperatures to characterize leakage conversions, thermal-cycle effects, and cryo testing methodology.</li>
+          <li>Designed &amp; released <strong>pressurized valve static-load fixtures in NX</strong>; analyzed margins in Ansys Mechanical and verified leak &amp; timing requirements with dev-test data.</li>
+          <li>Owned a <strong>cartridge-valve failure investigation</strong> — designing, releasing, and qualifying seal-install tooling for flight.</li>
+          <li>Designed &amp; released <strong>two vibe fixtures</strong> for gas filters to evaluate structure &amp; performance under flight-like conditions.</li>
+        </ul>
+        <div class="chips"><span>NX</span><span>Ansys Mechanical</span><span>Cryo Testing</span><span>GN2 / GHe</span><span>Tooling</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================================================= -->
+<!-- ================= PROJECT EXPERIENCE =================== -->
+<!-- ======================================================= -->
+<div class="category" id="projects">
+  <div class="wrap">
+    <h2>Project <span>Experience</span></h2>
+    <div class="bar"></div>
+    <div class="count">01 — 03</div>
+  </div>
+</div>
+
+<!-- ============== PROJECT 1: REV12 ============== -->
+<section id="rev12">
+  <div class="wrap">
+    <div class="proj-label"><span class="dot"></span>Project 01 — Penn Electric Racing</div>
+    <div class="shead">
+      <div class="kicker">Mechanical Lead · 2026–27</div>
+      <h2>REV12 — Team's First 4WD Formula-Style Racecar in 10 Years</h2>
+      <p>Cradle-to-grave ownership of design, manufacturing &amp; validation. I owned technical execution
+         across timelines, supplier procurement, BOM management, and engineering risk mitigation — and
+         drove all packaging &amp; integration to cut CoG height by 8%. Scroll to zoom into each subsystem I worked on.</p>
+    </div>
+
+    <!-- Split hero: left WITH aero+tires, right bare unsprung -->
+    <div class="rev12-hero reveal">
+      <div class="layer full"></div>
+      <div class="layer bare"></div>
+      <div class="divider"></div>
+      <span class="pill l">Aero Package + Tires</span>
+      <span class="pill r">Unsprung Assembly</span>
+    </div>
+
+    <div class="subnav">
+      <a href="#drivetrain">Drivetrain</a>
+      <a href="#aero">Aerodynamics</a>
+      <a href="#chassis">Driver Interface / Chassis</a>
+      <a href="#accumulator">Accumulator</a>
+      <a href="#suspension">Suspension</a>
+    </div>
+
+    <!-- DRIVETRAIN -->
+    <div class="sub reveal" id="drivetrain">
+      <div class="sub-media dark"><img src="images/gearbox-section.png" alt="Modular planetary gearbox cross-section"></div>
+      <div>
+        <span class="sub-badge">Subsystem · Drivetrain</span>
+        <h3>Modular In-Wheel Planetary Gearboxes &amp; Cooling</h3>
+        <ul>
+          <li>Conceptualized a fully modular <strong>1.5-stage planetary gearbox</strong> enabling complete assembly/disassembly for custom in-wheel packaging.</li>
+          <li>Co-designed the <strong>motors &amp; inverters cooling loop</strong>; built CFD thermal &amp; lap simulations to meet requirements and packaged the inverter box for <strong>-35% mass</strong>.</li>
+          <li>Owned <strong>FEM bolted-joint analysis</strong> for custom wheelhubs &amp; uprights, plus GD&amp;T drawings and tolerance stackups.</li>
+          <li>Restored the legacy motor dynamometer &amp; designed the gearbox mount, quantifying <strong>98% gearbox efficiency</strong>.</li>
+        </ul>
+        <div class="metrics" style="margin-top:18px">
+          <div class="metric"><div class="num">-35%</div><div class="lbl">Inverter box mass</div></div>
+          <div class="metric"><div class="num">98%</div><div class="lbl">Gearbox efficiency</div></div>
+          <div class="metric"><div class="num">88°C</div><div class="lbl">Peak motor winding (&lt;120°C)</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Drivetrain FEA + cooling + drawing gallery -->
+    <div class="sub reveal">
+      <div class="sub-media dark">
+        <div class="gallery2">
+          <figure><img src="images/wheelhub-fea-setup.png" alt="Wheelhub bolt-pretension FEA setup"><figcaption>Wheelhub — bolted-joint load setup (3× 11,934 N pretension)</figcaption></figure>
+          <figure><img src="images/wheelhub-fea-stress.png" alt="Wheelhub von-Mises result"><figcaption>Wheelhub — von-Mises stress (549 MPa max)</figcaption></figure>
+          <figure><img src="images/upright-fea-setup.png" alt="Upright bearing load FEA setup"><figcaption>Upright — bearing &amp; bolt load setup (15.8 kN)</figcaption></figure>
+          <figure><img src="images/upright-fea-stress.png" alt="Upright von-Mises result"><figcaption>Upright — von-Mises stress result</figcaption></figure>
+        </div>
+      </div>
+      <div>
+        <span class="sub-badge">Analysis · FEA &amp; Thermal</span>
+        <h3>Bolted-Joint FEA + Python Thermal Validation</h3>
+        <ul>
+          <li>Set up <strong>static-structural bolted-joint FEA</strong> on the wheelhubs and uprights in Ansys Mechanical — bearing loads, bolt pretension, and remote displacements driven by quasi-static load cases.</li>
+          <li>Built a <strong>Python lap-based thermal simulation</strong> over 22 laps: rear motor winding peaked at <strong>88°C (&lt;120°C limit)</strong> and the rear inverter at <strong>45°C (&lt;85°C limit)</strong>.</li>
+          <li>Validated CFD cooling-loop predictions against the thermal model to confirm margin before release.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="sub reveal">
+      <div class="sub-media"><img src="images/cooling-loop.png" alt="Motor and inverter cooling loop CAD"></div>
+      <div>
+        <span class="sub-badge">Example Drawing · Wheelhub v2</span>
+        <h3>Release-Ready GD&amp;T Drawing</h3>
+        <ul>
+          <li>Full GD&amp;T drawing package for the <strong>AL 7075-T6 Wheelhub v2</strong> — datums, position/profile tolerances, and LH/RH M48 thread callouts across a 4× part family.</li>
+          <li>Tolerance stackups tied to the bearing bore (Ø90 g5) and the 3× equi-spaced M6 mounting pattern.</li>
+          <li>Cooling loop above shows the integrated motor/inverter thermal circuit this hardware mounts into.</li>
+        </ul>
+        <div class="sub-media" style="margin-top:16px;background:#fff">
+          <img src="images/wheelhub-drawing.png" alt="Wheelhub v2 GD&T drawing">
+        </div>
+      </div>
+    </div>
+
+    <!-- AERO (REV12 side wing design lead) -->
+    <div class="sub reveal" id="aero">
+      <div class="sub-media"><img src="images/rev12-full.png" alt="REV12 full aero package"></div>
+      <div>
+        <span class="sub-badge">Subsystem · Aerodynamics</span>
+        <h3>Side Wing Design Lead</h3>
+        <ul>
+          <li>Led design of the <strong>side wings</strong> — added flap &amp; footplate to enhance ground effect, increasing component downforce by <strong>176%</strong>.</li>
+          <li>Integrated the side-wing package into the full car while protecting CoG and suspension clearances.</li>
+          <li>Drove the downforce–drag–mass tradeoff for the sidepod region against competition-point targets.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- DRIVER INTERFACE / CHASSIS -->
+    <div class="sub reveal" id="chassis">
+      <div class="sub-media"><img src="images/chassis-frame.png" alt="REV12 chassis tube frame"></div>
+      <div>
+        <span class="sub-badge">Subsystem · Driver Interface / Chassis</span>
+        <h3>Cross-Subsystem Packaging &amp; Integration</h3>
+        <ul>
+          <li>Led <strong>packaging &amp; integration across all subsystems</strong>, coordinating interfaces to reduce CoG height by <strong>8%</strong>.</li>
+          <li>Owned the <strong>steering rack cover design</strong> — driver-interface ergonomics and protection in the front bulkhead region.</li>
+          <li>Managed BOM, supplier procurement, and engineering risk to keep the chassis build on the master schedule.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ACCUMULATOR -->
+    <div class="sub reveal" id="accumulator">
+      <div class="sub-media"><img src="images/accumulator.png" alt="Accumulator / inverter box CAD"></div>
+      <div>
+        <span class="sub-badge">Subsystem · Accumulator</span>
+        <h3>Inverter Box &amp; Battery Ancillaries Packaging</h3>
+        <ul>
+          <li>Conceptualized <strong>inverter box packaging</strong> achieving a <strong>-35% mass reduction</strong>.</li>
+          <li>Packaged the <strong>battery ancillaries box</strong> within tight accumulator volume and thermal constraints.</li>
+          <li>Conceptualized a <strong>blind-fastening mounting scheme</strong> enabling easy insertion/removal of the module for service.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- SUSPENSION -->
+    <div class="sub reveal" id="suspension">
+      <div class="sub-media"><img src="images/suspension.png" alt="Suspension tie-rod linkage CAD"></div>
+      <div>
+        <span class="sub-badge">Subsystem · Suspension</span>
+        <h3>Tie-Rod Linkage Design</h3>
+        <ul>
+          <li>Designed the <strong>tie-rod linkage</strong>, resolving steering geometry and packaging against the upright and chassis hardpoints.</li>
+          <li>Coordinated the unsprung linkage with the in-wheel drivetrain and brake package for both axles of the 4WD car.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== PROJECT 2: REV11 AERO ============== -->
+<section id="rev11">
+  <div class="wrap">
+    <div class="proj-label"><span class="dot"></span>Project 02 — Penn Electric Racing</div>
+    <div class="shead">
+      <div class="kicker">Aerodynamics &amp; Composites Lead · 2025–26</div>
+      <h2>REV11 — Full Aero Package</h2>
+      <p>Owned the aero package end-to-end: CFD-driven design, structural wing development, mold tooling,
+         and on-track validation.</p>
+    </div>
+    <div class="pcard reveal">
+      <div class="pcard-media" style="background:#fff"><img src="images/aero-overview.png" alt="REV11 aero overview" style="height:100%;object-fit:contain"></div>
+      <div>
+        <h3>Aero Overview</h3>
+        <div class="role">Aerodynamics &amp; Composites Lead</div>
+        <ul>
+          <li>Generated an <strong>aero map of 500+ CFD simulations</strong> characterizing performance across pitch, roll, and yaw — achieving <strong>98 lbs of downforce at 30 mph (+39.7%)</strong> with minimal drag increase.</li>
+          <li>CFD <strong>validated on-track</strong> with shock pots, pressure sensors, and tuft testing.</li>
+          <li>Designed wing structures to be <strong>8× stiffer (&lt;5 mm under 200 N)</strong>, validated via compliance testing; owned mold tooling.</li>
+          <li>Manufactured <strong>60+ carbon fiber parts</strong> via resin infusion and wet layups; owned tooling design &amp; post-processing.</li>
+        </ul>
+        <div class="metrics" style="margin-top:16px">
+          <div class="metric"><div class="num">500+</div><div class="lbl">CFD sims</div></div>
+          <div class="metric"><div class="num">+39.7%</div><div class="lbl">Downforce gain</div></div>
+          <div class="metric"><div class="num">8×</div><div class="lbl">Wing stiffness</div></div>
+        </div>
+        <div class="chips"><span>Star-CCM+</span><span>Resin Infusion</span><span>Mold Tooling</span><span>Track Validation</span></div>
+      </div>
+    </div>
+    <div class="pcard reveal">
+      <div class="pcard-media"><img src="images/rev11-rearwing.png" alt="REV11 rear wing render" style="height:100%;object-fit:cover"></div>
+      <div>
+        <h3>Rear Wing &amp; Ground-Effect Package</h3>
+        <ul>
+          <li>Lofted rear wing managing cockpit flow to increase rear downforce; 3-element front wing with tunable COP migration.</li>
+          <li>Vortex generators &amp; whiskers to manage tire wakes and shift center of pressure rearward.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== PROJECT 3: DRS ============== -->
+<section id="drs">
+  <div class="wrap">
+    <div class="proj-label"><span class="dot"></span>Project 03 — Penn Electric Racing</div>
+    <div class="shead">
+      <div class="kicker">Aero Subsystem · First in Team History</div>
+      <h2>Drag Reduction System (DRS)</h2>
+      <p>Worked with two other rookies to develop the team's first-ever DRS — an 800 psi pneumatic
+         system achieving 40% drag reduction.</p>
+    </div>
+    <div class="pcard reveal">
+      <div class="pcard-media" style="background:#fff"><img src="images/drs-cfd.png" alt="DRS CFD delta-velocity" style="height:100%;object-fit:contain"></div>
+      <div>
+        <h3>CFD &amp; Competition-Point Validation</h3>
+        <ul>
+          <li>Ran <strong>parallel competition simulation &amp; CFD development</strong> to set target mass and drag reductions against a <strong>5 competition-point</strong> goal.</li>
+          <li>Constraints: <strong>2 kg max mass</strong> for 5 points and a target <strong>C_d = 1.0</strong>.</li>
+          <li>Used a <strong>2D genetic algorithm</strong> to find the optimal minimal-drag configuration; delta-velocity CFD confirmed gains on the Endurance track.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="pcard reveal">
+      <div class="pcard-media" style="background:#fff"><img src="images/drs-pneumatic.png" alt="DRS pneumatic system" style="height:100%;object-fit:contain"></div>
+      <div>
+        <h3>800 psi Pneumatic Actuation</h3>
+        <ul>
+          <li>Designed an <strong>800 psi pneumatic loop</strong> with two adjustable step-down regulators (80 psi operating), an 800 psi purge valve, and a 3000 psi burst disk for safe operation.</li>
+          <li>Built an <strong>MDF prototype</strong> to iterate the actuation linkage before committing to final hardware.</li>
+          <li>Achieved a <strong>40% drag reduction</strong> on straights.</li>
+        </ul>
+        <div class="chips"><span>Pneumatics</span><span>Genetic Algorithm</span><span>CFD</span><span>Linkage Design</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="wrap">
+    <div class="contact reveal">
+      <h2>Let's build something fast.</h2>
+      <p>Open to mechanical design, structures, and vehicle/aero engineering roles.</p>
+      <div class="btns" style="justify-content:center">
+        <a class="btn primary" href="mailto:liuethan@engineering.upenn.edu">Email Me</a>
+        <a class="btn ghost" href="#" target="_blank">LinkedIn</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">© <span id="yr"></span> Ethan Liu · liuethan@engineering.upenn.edu · (408) 832-9920</div>
+</footer>
+
+<script>
+  document.getElementById('yr').textContent = new Date().getFullYear();
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} });
+  },{threshold:.15});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+  document.querySelectorAll('#nav a').forEach(a=>a.addEventListener('click',()=>document.getElementById('nav').classList.remove('open')));
+</script>
+
+</body>
+</html>
